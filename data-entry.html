@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DISA - Production Data Entry</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+  <!-- ✅ Page Protection -->
+  <script>
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) {
+      alert("Access denied. Please log in first.");
+      window.location.href = "index.html";
+    }
+  </script>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg bg-primary navbar-dark shadow-sm">
+    <div class="container-fluid">
+      <a href="dashboard.html" class="btn btn-outline-light me-2">
+        <i class="bi bi-arrow-left"></i> Back
+      </a>
+      <span class="navbar-brand d-flex align-items-center">
+        <i class="bi bi-clipboard2-data-fill me-2"></i>
+        <span class="d-none d-sm-inline">DISA Production</span> Entry
+      </span>
+      <div class="navbar-text d-flex align-items-center">
+        <span id="connectionStatus" class="badge bg-success me-2">
+          <i class="bi bi-wifi"></i> Online
+        </span>
+        <span id="currentDateTime" class="text-white-50"></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Form -->
+  <main class="container my-auto py-4">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-xl-6">
+        <div class="card shadow-lg border-0">
+          <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">
+              <i class="bi bi-clipboard2-plus"></i> New Production Record
+            </h5>
+          </div>
+          <div class="card-body p-4 p-md-5">
+            <form id="dataForm" novalidate>
+              <!-- Machine ID -->
+              <div class="form-floating mb-4">
+                <input type="text" class="form-control" id="machineId" placeholder="M-1001" required
+                  pattern="[A-Za-z0-9-]{2,20}" title="2-20 alphanumeric characters with optional hyphens" />
+                <label for="machineId" class="fw-semibold">
+                  <i class="bi bi-cpu me-2"></i>Machine ID
+                </label>
+                <div class="invalid-feedback">
+                  Please enter a valid Machine ID (2-20 characters)
+                </div>
+              </div>
+
+              <!-- Good Parts -->
+              <div class="mb-4">
+                <label for="goodParts" class="form-label fw-semibold">
+                  <i class="bi bi-check-circle-fill text-success me-2"></i>Good Parts
+                </label>
+                <div class="input-group">
+                  <input type="number" class="form-control form-control-lg" id="goodParts" min="0" step="1" value="0" required />
+                  <span class="input-group-text">units</span>
+                </div>
+                <div class="invalid-feedback">
+                  Must be a positive number
+                </div>
+              </div>
+
+              <!-- Defects -->
+              <div class="mb-4">
+                <label for="defects" class="form-label fw-semibold">
+                  <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>Defects
+                </label>
+                <div class="input-group">
+                  <input type="number" class="form-control form-control-lg" id="defects" min="0" step="1" value="0" required />
+                  <span class="input-group-text">units</span>
+                </div>
+                <div class="invalid-feedback">
+                  Must be a positive number
+                </div>
+              </div>
+
+              <!-- Buttons -->
+              <div class="d-grid gap-3 mt-4">
+                <button type="submit" class="btn btn-primary btn-lg py-3 fw-semibold">
+                  <i class="bi bi-save-fill me-2"></i>Submit Record
+                </button>
+                <button type="reset" class="btn btn-outline-secondary">
+                  <i class="bi bi-eraser-fill me-2"></i>Clear Form
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-auto py-3 bg-light border-top">
+    <div class="container text-center">
+      <small class="text-muted d-block">
+        <i class="bi bi-shield-lock-fill me-1"></i> DISA Production System v2.0
+      </small>
+      <small class="text-muted d-block mt-1">
+        &copy; 2025 All Rights Reserved | Last Saved: <span id="lastSaved">Never</span>
+      </small>
+    </div>
+  </footer>
+
+  <!-- Loading Spinner -->
+  <div class="overlay" id="loadingOverlay">
+    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+      <span class="visually-hidden">Saving...</span>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="script.js" defer></script>
+  <script>
+    // Date and time
+    function updateDateTime() {
+      const now = new Date();
+      document.getElementById("currentDateTime").textContent = now.toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
+    }
+
+    // Connection status
+    function updateConnectionStatus() {
+      const status = document.getElementById("connectionStatus");
+      if (navigator.onLine) {
+        status.className = "badge bg-success me-2";
+        status.innerHTML = '<i class="bi bi-wifi"></i> Online';
+      } else {
+        status.className = "badge bg-danger me-2";
+        status.innerHTML = '<i class="bi bi-wifi-off"></i> Offline';
+      }
+    }
+
+    // Start live updates
+    updateDateTime();
+    updateConnectionStatus();
+    setInterval(updateDateTime, 30000);
+    window.addEventListener("online", updateConnectionStatus);
+    window.addEventListener("offline", updateConnectionStatus);
+  </script>
+</body>
+</html>

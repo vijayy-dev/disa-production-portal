@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Register - DISA Portal</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" />
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="bg-light d-flex align-items-center min-vh-100">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <div class="card shadow p-4">
+          <h4 class="text-center mb-3 text-primary">
+            <i class="bi bi-person-plus me-2"></i>Register Account
+          </h4>
+          <form id="registerForm" novalidate>
+            <!-- Username -->
+            <div class="mb-3">
+              <label for="regUsername" class="form-label fw-semibold">Username</label>
+              <input type="text" id="regUsername" class="form-control" required />
+            </div>
+
+            <!-- Password -->
+            <div class="mb-3">
+              <label for="regPassword" class="form-label fw-semibold">Password</label>
+              <input type="password" id="regPassword" class="form-control" required />
+            </div>
+
+            <!-- Role -->
+            <div class="mb-4">
+              <label for="regRole" class="form-label fw-semibold">Role</label>
+              <select id="regRole" class="form-select" required>
+                <option value="" disabled selected>Select role...</option>
+                <option value="operator">Operator</option>
+                <option value="supervisor">Supervisor</option>
+              </select>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="bi bi-person-check me-1"></i> Register
+            </button>
+
+            <!-- Login Link -->
+            <div class="text-center mt-3">
+              <a href="index.html">Already have an account? Login</a>
+            </div>
+          </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-3 text-muted">
+          <small>© 2025 DISA Production System</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+    const getUsers = () => JSON.parse(localStorage.getItem("users") || "[]");
+    const saveUsers = (users) => localStorage.setItem("users", JSON.stringify(users));
+
+    document.getElementById("registerForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const username = document.getElementById("regUsername").value.trim();
+      const password = document.getElementById("regPassword").value.trim();
+      const role = document.getElementById("regRole").value;
+
+      if (!username || !password || !role) {
+        alert("All fields are required!");
+        return;
+      }
+
+      const users = getUsers();
+      const exists = users.some((u) => u.username === username);
+      if (exists) {
+        alert("Username already exists. Choose a different one.");
+        return;
+      }
+
+      users.push({ username, password, role });
+      saveUsers(users);
+      alert("Registration successful! You can now log in.");
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>
